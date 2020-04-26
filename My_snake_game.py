@@ -52,8 +52,6 @@ while mloop:
             score=len(Snake)-1
             if score > High_score:
                 High_score=score
-            else:
-                High_score=High_score
             print('Episodes :',Episode,', High_score :',High_score,', Score :',score)
             Episode+=1
             loop=False
