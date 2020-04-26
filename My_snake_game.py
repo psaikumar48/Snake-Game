@@ -2,11 +2,8 @@ import pygame
 import random
 
 M,N,grid_size=40,30,20
-grids=[]
-for i in range(M):
-    for j in range(N):
-        grids.append((i,j))
-action=['Top','Right','Bottum','Left']
+grids=[(i,j) for i in range(M) for j in range(N)]
+Actions=['Top','Right','Bottum','Left']
 Episode,High_score= 1,0
 
 def food():
@@ -22,18 +19,17 @@ def display():
 def update_snake():
     global snake_tail,snake_head,snake_body
     x,y=Snake[0][0],Snake[0][1]
-    new_snake=[]
-    if move == 'Right' :
+    if action == 'Right' :
         Snake.insert(0,(x+1,y))
-    elif move == 'Left' :
+    elif action == 'Left' :
         Snake.insert(0,(x-1,y))
-    elif move == 'Top' :
+    elif action == 'Top' :
         Snake.insert(0,(x,y-1))
-    elif move == 'Bottum' :
+    elif action == 'Bottum' :
         Snake.insert(0,(x,y+1))
     snake_tail=Snake.pop()
     snake_head=Snake[0]
-    snake_body=Snake[1:len(new_snake)]
+    snake_body=Snake[1:len(Snake)]
     display()
 
 mloop=True
@@ -42,7 +38,7 @@ while mloop:
     screen = pygame.display.set_mode((M*grid_size,N*grid_size))
     Snake_wait_time=150
     Snake=[random.choice(grids)]
-    move = random.choice(action)
+    action = random.choice(Actions)
     food()
     loop=True
     while loop:
@@ -52,7 +48,7 @@ while mloop:
             food()
             Snake.append(snake_tail)
             Snake_wait_time -=5
-        elif not (snake_head in grids) or snake_head in snake_body:
+        elif snake_head not in grids or snake_head in snake_body:
             score=len(Snake)-1
             if score > High_score:
                 High_score=score
@@ -69,10 +65,10 @@ while mloop:
                 mloop=False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
-                    move='Right'
+                    action='Right'
                 elif event.key == pygame.K_LEFT:
-                    move='Left'
+                    action='Left'
                 elif event.key == pygame.K_UP:
-                    move='Top'
+                    action='Top'
                 elif event.key == pygame.K_DOWN:
-                    move='Bottum'
+                    action='Bottum'
