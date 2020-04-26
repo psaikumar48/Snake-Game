@@ -1,61 +1,65 @@
 import pygame
 import random
 
+M,N,grid_size=40,30,20
+grids=[]
+for i in range(M):
+    for j in range(N):
+        grids.append((i,j))
+action=['Top','Right','Bottum','Left']
+Episode,High_score= 1,0
+
 def food():
+    global Food
     snake_no_grids= [i for i in grids if i not in Snake]
-    food_plc = random.choice(snake_no_grids)
-    return food_plc
+    Food = random.choice(snake_no_grids)
 def display():
     pygame.draw.rect(screen,(0,0,0), (0,0,M*grid_size,N*grid_size))
     for i in Snake:
         pygame.draw.rect(screen,(255,255,255), (i[0]*grid_size,i[1]*grid_size,grid_size,grid_size),1)
     pygame.draw.rect(screen,(255,255,255), (Food[0]*grid_size,Food[1]*grid_size,grid_size,grid_size))
     pygame.display.update()
-def new_snake():
-    global snake_tail,snake_head
+def update_snake():
+    global snake_tail,snake_head,snake_body
+    x,y=Snake[0][0],Snake[0][1]
     new_snake=[]
     if move == 'Right' :
-        new_snake.append((Snake[0][0]+1,Snake[0][1]))
+        Snake.insert(0,(x+1,y))
     elif move == 'Left' :
-        new_snake.append((Snake[0][0]-1,Snake[0][1]))
+        Snake.insert(0,(x-1,y))
     elif move == 'Top' :
-        new_snake.append((Snake[0][0],Snake[0][1]-1))
+        Snake.insert(0,(x,y-1))
     elif move == 'Bottum' :
-        new_snake.append((Snake[0][0],Snake[0][1]+1))
-    for i in Snake:
-        new_snake.append(i)
-    snake_tail=new_snake.pop()
-    snake_head=new_snake[0]
-    return new_snake
-
-M,N=40,30
-grid_size=20
-Snake=[(-1,0),(-2,0),(-3,0),(-4,0)]
-move='Right'
-grids=[]
-for i in range(M):
-    for j in range(N):
-        grids.append((i,j))
+        Snake.insert(0,(x,y+1))
+    snake_tail=Snake.pop()
+    snake_head=Snake[0]
+    snake_body=Snake[1:len(new_snake)]
+    display()
 
 mloop=True
 while mloop:
     pygame.init()
     screen = pygame.display.set_mode((M*grid_size,N*grid_size))
-    Food=food()
+    Snake_wait_time=150
+    Snake=[random.choice(grids)]
+    move = random.choice(action)
+    food()
     loop=True
     while loop:
-        pygame.time.wait(150)
-        Snake=new_snake()
-        display()
-        snake_body=Snake[1:len(Snake)]
+        pygame.time.wait(Snake_wait_time)
+        update_snake()
         if snake_head==Food:
-            Food=food()
+            food()
             Snake.append(snake_tail)
-        if not (snake_head in grids) or snake_head in snake_body:
-            print('Game over')
-            print('Score : ',len(Snake)-4)
-            Snake=[(-1,0),(-2,0),(-3,0),(-4,0)]
-            move='Right'
+            Snake_wait_time -=5
+        elif not (snake_head in grids) or snake_head in snake_body:
+            score=len(Snake)-1
+            if score > High_score:
+                High_score=score
+            else:
+                High_score=High_score
+            print('Episodes :',Episode,', High_score :',High_score,', Score :',score)
+            Episode+=1
             loop=False
         ev=pygame.event.get()
         for event in ev:
